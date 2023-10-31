@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { FormEvent, useState, useRef } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+import * as api from './api';
+import { Recipe } from './types';
+import RecipeCards from './components/RecipeCards';
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+const App = () => {
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const pageNumber = useRef(1);
 
-export default App
+    const handleSearchSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const fetchedRecipes = await api.searchRecipes(searchTerm, 1);
+            setRecipes(fetchedRecipes.results);
+            pageNumber.current = 1;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    //Ajout 
+    const handleViewMoreClick = async () => {
+      const nextPage = pageNumber.current +1
+      try {
+        const nextRecipes = await api.searchRecipes(searchTerm, nextPage);
+        setRecipes([...recipes, ...nextRecipes.results]);
+        pageNumber.current = nextPage;
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    return (
+        <div>
+            <form onSubmit={(e) => handleSearchSubmit(e)}>
+                <input
+                    type='text'
+                    required
+                    placeholder='Enter a search term...'
+                    value={searchTerm}
+                    onChange={(event)=> setSearchTerm(event.target.value)}
+                />
+                <button type='submit'>Submit</button>
+            </form>
+            {recipes.map((recipe) => {
+                return (
+                    <RecipeCards recipe={recipe}/>
+                );
+            })}
+            <button className="view-more-button"
+            onClick={handleViewMoreClick}>
+              View More
+            </button>
+        </div>
+    );
+};
+
+export default App;

@@ -4,8 +4,10 @@ import * as RecipeAPI from './recipe-api';
 
 const app = express();
 
-app.use(express.json());
 app.use(cors());
+
+app.use(express.json());
+
 
 app.get('/api/recipes/search', async (req, res) => {
     const searchTerm = req.query.searchTerm as string;
