@@ -40,7 +40,7 @@ export const getRecipeSummary = async (recipeId: string) => {
      
     url.search = new URLSearchParams(params).toString()
     const response = await fetch(url);
-    const json = await response.json();
+    const resultsJson = await response.json();
 
-    return json;
+    return resultsJson;
 }

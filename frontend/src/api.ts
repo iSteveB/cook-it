@@ -1,4 +1,5 @@
 
+
 export const searchRecipes = async (searchTerm: string, page: number) => {
     const baseUrl = new URL("http://localhost:8080/api/recipes/search");
     baseUrl.searchParams.append('searchTerm', searchTerm);
@@ -10,4 +11,17 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
     }
 
     return response.json();
+}
+
+export const getRecipeSummary = async (recipeId: string) => {
+    const url = new URL(`http://localhost:8080/api/recipes/${recipeId}/summary`);
+
+    const response = await fetch(url);
+
+    if(!response.ok){
+        throw new Error(`HTTP Error! Status: ${response.status}`)
+    }
+
+    return response.json()
+
 }
