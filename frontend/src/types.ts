@@ -11,3 +11,4 @@ export interface RecipeSummary {
     "title": string,
     "summary": string
 }
+
