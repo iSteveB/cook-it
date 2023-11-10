@@ -56,11 +56,23 @@ const App = () => {
     const addFavoriteRecipe = async (recipe: Recipe) => {
         try {
             await api.addFavoriteRecipe(recipe);
-            setFavoritesRecipes([...favoritesRecipes, recipe])
+            setFavoritesRecipes([...favoritesRecipes, recipe]);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-    }
+    };
+
+    const removeFavoriteRecipe = async (recipe: Recipe) => {
+        try {
+            await api.removeFavoriteRecipe(recipe);
+            const filteredFavoritesRecipes = favoritesRecipes.filter(
+                (favRecipe) => recipe.id !== favRecipe.id
+            );
+            setFavoritesRecipes(filteredFavoritesRecipes);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <div>
@@ -84,13 +96,22 @@ const App = () => {
                         <button type='submit'>Submit</button>
                     </form>
                     {recipes.map((recipe) => {
+                        const isFavorite = favoritesRecipes.some(
+                            (favRecipe) => recipe.id === favRecipe.id
+                        );
+
                         return (
                             <RecipeCards
                                 recipe={recipe}
                                 onClick={() => {
                                     setSelectedRecipe(recipe);
                                 }}
-                                onFavButtonClick={addFavoriteRecipe}
+                                onFavButtonClick={
+                                    isFavorite
+                                        ? removeFavoriteRecipe
+                                        : addFavoriteRecipe
+                                }
+                                isFavorite={isFavorite}
                             />
                         );
                     })}
@@ -104,13 +125,14 @@ const App = () => {
 
             {selectedTab === 'favorites' && (
                 <div>
-                    {favoritesRecipes.map((recipe) => 
+                    {favoritesRecipes.map((recipe) => (
                         <RecipeCards
                             recipe={recipe}
                             onClick={() => setSelectedRecipe(recipe)}
-                            onFavButtonClick={()=> undefined}
+                            onFavButtonClick={() => removeFavoriteRecipe(recipe)}
+                            isFavorite={true}
                         />
-                    )}
+                    ))}
                 </div>
             )}
 
